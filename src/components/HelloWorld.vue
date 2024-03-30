@@ -2,7 +2,7 @@
   <div class="grid grid-cols-12 gap-10 pt-10">
     <div class="col-span-12 flex justify-center">
       <img src="../../public/imagem3.png" style="width: 10%; height: 100%;">
-      <div class="font-['Curlz_MT'] text-5xl sm:text-6xl md:text-8xl lg:text-9xl pt-20 text-blue-300">Chá da Alice</div>
+      <img src="../../public/imagem4.png" style="width: 50%; height: 50%; margin-top: 8%;">
       <img src="../../public/imagem2.png" style="width: 10%; height: 100%;">
     </div>
     <div class="col-span-12 flex flex-wrap gap-10 pl-28 sm:justify-center">

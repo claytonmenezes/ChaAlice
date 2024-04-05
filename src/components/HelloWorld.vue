@@ -10,61 +10,78 @@
         <div class="inline-block text-xl font-semibold border-solid p-1 border-4 rounded-full border-blue-300 px-5 mb-4 ">
           {{ grupo.nome }}
         </div>
-        <div v-for="(item, index) in grupo.itens" :key="index" class="pb-1">
-          <input type="checkbox" v-model="item.selecionado" />
-          {{ item.nome }}
+        <div v-for="(item, index) in grupo.itens" :key="index" class="pb-1 pl-6 flex gap-2 flex-nowrap">
+          <input v-if="item.qtde > 0" type="checkbox" v-model="item.selecionado"/>
+          <div v-if="item.qtde > 0">
+            {{ item.nomeItem }}
+          </div>
+          <div v-else class="line-through">
+            {{ item.nomeItem }}
+          </div>
         </div>
       </div>
     </div>
     <div class="col-span-12 flex justify-center pb-10">
-      <Modal/>
+      <Modal @aoSalvar="aoSalvar"/>
+    </div>
+    <div class="col-span-12 flex justify-center pb-10">
+      <ModalErro :abrirErro="modalErro" @update:abrirErro="modalErro = $event"/>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Modal from './Modal.vue'
+import ModalErro from './ModalErro.vue'
+import { listar, atualizar } from '../metodos/db'
 
-const grupos = ref([
-  {
-    nome: 'Fraldas',
-    itens: [
-      {nome: 'Fralda M', selecionado: false},
-      {nome: 'Fralda G', selecionado: false},
-    ]
-  },
-  {
-    nome: 'Quarto',
-    itens: [
-      {nome: 'Berço desmontável', selecionado: false},
-      {nome: 'Jogos de lençol para berço desmontável', selecionado: false},
-      {nome: 'Mantas', selecionado: false},
-      {nome: 'Cobertores de berço', selecionado: false},
-      {nome: 'Cobertores de enrolar', selecionado: false},
-      {nome: 'Colchonete para berço desmontável', selecionado: false},
-      {nome: 'Jogos de lençol para berço', selecionado: false},
-      {nome: 'Fronhas avulsas', selecionado: false},
-      {nome: 'Travesseiro antirrefluxo', selecionado: false},
-      {nome: 'Travesseiros antissufocante', selecionado: false},
-      {nome: 'Posicionador para dormir', selecionado: false},
-      {nome: 'Kits para berço', selecionado: false},
-      {nome: 'Mosquiteiro', selecionado: false},
-      {nome: 'Kits de fralda de boca', selecionado: false},
-      {nome: 'Blanket ( naninha )', selecionado: false},
-      {nome: 'Ninho', selecionado: false},
-      {nome: 'Móbile', selecionado: false},
-      {nome: 'Kits de cabide', selecionado: false},
-    ]
-  },
-  {
-    nome: 'Roupinhas de bebê',
-    itens: [
-      {nome: 'Fralda RN', selecionado: false},
-      {nome: 'Fralda P', selecionado: false},
-      {nome: 'Fralda M', selecionado: false},
-      {nome: 'Fralda G', selecionado: false},
-    ]
+const grupos = ref([])
+const modalErro = ref(false)
+
+const aoSalvar = async (nome) => {
+  const selecionados = ref([])
+  let selecionouFralda = false
+  for (const grupo of grupos.value) {
+    for (const item of grupo.itens) {
+      if (item.selecionado) {
+        if (grupo.nome === 'Fraldas') {
+          selecionouFralda = true
+        }
+        item.nome = nome
+        selecionados.value.push(item)
+      }
+    }
   }
-])
+  if (selecionouFralda) {
+    await atualizar(selecionados.value)
+    for (const selecionado of selecionados.value) {
+      selecionado.selecionado = false
+      selecionado.qtde--
+    }
+  } else {
+    modalErro.value = true
+  }
+}
+const agruparItensPorGrupo = (lista) => {
+  const grupos = []
+  for (const item of lista) {
+    const index = grupos.findIndex(g => g.nome === item.grupo)
+    if (index === -1) {
+      grupos.push({
+        nome: item.grupo,
+        itens: [
+          {id: item.id, nomeItem: item.item, selecionado: item.selecionado, qtde: item.qtde, nome: item.nome}
+        ]
+      })
+    } else {
+      grupos[index].itens.push({id: item.id, nomeItem: item.item, selecionado: item.selecionado, qtde: item.qtde, nome: item.nome})
+    }
+  }
+  return grupos
+}
+onMounted(async () => {
+  const itens = await listar()
+  grupos.value = agruparItensPorGrupo(itens)
+})
 </script>

@@ -2,14 +2,14 @@ import axios from 'axios'
 
 const listar = async () => {
     const itens = await axios({
-        baseURL: 'http://200.98.144.254:6008',
+        baseURL: 'https://chaaliceback.onrender.com',
         url: 'itens'
     }).then(res => res.data)
     return itens
 }
 const atualizar = async (itensSelecionados) => {
     await axios({
-        baseURL: 'http://200.98.144.254:6008',
+        baseURL: 'https://chaaliceback.onrender.com',
         method: 'put',
         url: 'itens',
         data: {itensSelecionados}

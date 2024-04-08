@@ -86,10 +86,8 @@ const agruparItensPorGrupo = (lista) => {
 }
 onMounted(async () => {
   load.value = true
-  setTimeout(async () => {
-    const itens = await listar()
-    grupos.value = agruparItensPorGrupo(itens)
-    load.value = false
-  }, 10000)
+  const itens = await listar()
+  grupos.value = agruparItensPorGrupo(itens)
+  load.value = false
 })
 </script>

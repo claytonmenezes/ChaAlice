@@ -27,6 +27,9 @@
     <div class="col-span-12 flex justify-center pb-10">
       <ModalErro :abrirErro="modalErro" @update:abrirErro="modalErro = $event"/>
     </div>
+    <div v-if="load" class="fixed h-full w-full bg-opacity-50 grid justify-center items-center bg-gray-500" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+      <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+    </div>
   </div>
 </template>
 
@@ -38,6 +41,7 @@ import { listar, atualizar } from '../metodos/db'
 
 const grupos = ref([])
 const modalErro = ref(false)
+const load = ref(true)
 
 const aoSalvar = async (nome) => {
   const selecionados = ref([])
@@ -81,7 +85,11 @@ const agruparItensPorGrupo = (lista) => {
   return grupos
 }
 onMounted(async () => {
-  const itens = await listar()
-  grupos.value = agruparItensPorGrupo(itens)
+  load.value = true
+  setTimeout(async () => {
+    const itens = await listar()
+    grupos.value = agruparItensPorGrupo(itens)
+    load.value = false
+  }, 10000)
 })
 </script>

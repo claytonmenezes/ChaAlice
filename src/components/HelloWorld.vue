@@ -86,7 +86,7 @@ const agruparItensPorGrupo = (lista) => {
 }
 onMounted(async () => {
   load.value = true
-  const itens = await listar()
+  // const itens = await listar()
   grupos.value = agruparItensPorGrupo(itens)
   load.value = false
 })
